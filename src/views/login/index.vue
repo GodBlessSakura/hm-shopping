@@ -29,12 +29,12 @@
 </template>
 
 <script>
-import {condeLogin, getMessageCode, getPicCode} from '@/api/login'
-import {Toast} from 'vant'
+import { condeLogin, getMessageCode, getPicCode } from '@/api/login'
+import { Toast } from 'vant'
 
 export default {
   name: 'LoginPage',
-  data() {
+  data () {
     return {
       picCode: '',
       pickey: '',
@@ -46,18 +46,18 @@ export default {
       smsCode: '' // 短信验证码
     }
   },
-  async created() {
+  async created () {
     await this.getPicCode()
   },
   methods: {
     // 获取图形验证码
-    async getPicCode() {
-      const {data: {base64, key}} = await getPicCode()
+    async getPicCode () {
+      const { data: { base64, key } } = await getPicCode()
       this.picUrl = base64
       this.pickey = key
     },
     // 校验手机号和图形验证码是否合法
-    validFn() {
+    validFn () {
       if (!/^1[3-9]\d{9}$/.test(this.mobile)) {
         this.$toast('请输入正确的手机号')
         return false
@@ -69,7 +69,7 @@ export default {
       return true
     },
 
-    async login() {
+    async login () {
       if (!this.validFn()) {
         return
       }
@@ -78,11 +78,12 @@ export default {
         this.$toast('请输入正确的手机验证码')
         return
       }
-      await condeLogin(this.smsCode, this.mobile)
+      const res = await condeLogin(this.smsCode, this.mobile)
+      this.$store.commit('user/setUserInfo', res.data)
       Toast('登录成功')
       this.$router.push('/')
     },
-    async getCode() {
+    async getCode () {
       if (!this.validFn()) {
         return
       }
@@ -102,7 +103,7 @@ export default {
       }
     }
   },
-  destroyed() {
+  destroyed () {
     // 离开页面，清除定时器
     clearInterval(this.timer)
   }

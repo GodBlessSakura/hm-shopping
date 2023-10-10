@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {Toast} from 'vant'
+import { Toast } from 'vant'
 
 // 创建axios实例，对创建出来的实例进行自定义配置
 const instance = axios.create({
@@ -11,6 +11,13 @@ const instance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
+  // 开启loading，并禁止背景点击(节流处理，防止多次无效触发)
+  Toast.loading({
+    message: '加载中...',
+    forbidClick: true,
+    duration: 0,
+    loadingType: 'spinner' // 配置loading图标
+  })
   return config
 }, function (error) {
   // 对请求错误做些什么
@@ -27,6 +34,8 @@ instance.interceptors.response.use(function (response) {
     Toast(res.message)
     // 抛出错误的promise,不会走到await那里了
     return Promise.reject(res.message)
+  } else {
+    Toast.clear()
   }
   return res
 }, function (error) {
